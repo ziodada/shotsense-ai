@@ -1,2 +1,2 @@
-# shotsense-ai
-Ai Basketball Shot Analysis App
+# 🏀 ShotSense AI
+[contenuto readme]
