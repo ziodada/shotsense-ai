@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head><title>🏀 ShotSense AI</title>
+<style>
+body{font-family:Arial;background:linear-gradient(135deg,#667eea,#764ba2);margin:0;padding:20px}
+.container{max-width:800px;margin:0 auto;background:white;padding:40px;border-radius:20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+.logo{font-size:4em;margin-bottom:20px}
+h1{color:#2c3e50;font-size:2.5em}
+.upload-box{background:#f8f9fa;padding:30px;border:3px dashed #3498db;border-radius:15px;margin:30px 0}
+.btn{background:#e74c3c;color:white;padding:15px 25px;border:none;border-radius:15px;font-size:16px;cursor:pointer;margin:10px;text-decoration:none;display:inline-block}
+input,select{padding:12px;margin:10px;border:2px solid #ddd;border-radius:8px;font-size:14px}
+</style></head>
+<body>
+<div class="container">
+<div class="logo">🏀</div>
+<h1>ShotSense AI</h1>
+<p style="color:#7f8c8d;font-size:1.2em">Big 3 Basketball Analysis</p>
+<div class="upload-box">
+<h2>📤 Carica Video</h2>
+<form action="/upload" method="post" enctype="multipart/form-data">
+<input type="file" name="file" accept=".mp4,.mov,.avi" required><br>
+<select name="shooting_arm">
+<option value="RIGHT">Destro 👉</option>
+<option value="LEFT">Sinistro 👈</option>
+</select><br>
+<button type="submit" class="btn">🚀 Analizza Big 3</button>
+</form>
+</div>
+</div>
+</body>
+</html>
