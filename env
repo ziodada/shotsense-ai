@@ -1,0 +1,4 @@
+FLASK_SECRET_KEY="2xrfwYRXJc8eeuyupoOneVt9vvX_2mniWbbvkxP1nzgM4fvh2"
+GROQ_API_KEY="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"
+NGROK_AUTHTOKEN="2xrfwYRXJc8eeuyupoOneVt9vvX_2mniWbbvkxP1nzgM4fvh2" # <<< METTI QUI IL TOKEN CORRETTO
+OPENAI_API_KEY="2xrfwYRXJc8eeuyupoOneVt9vvX_2mniWbbvkxP1nzgM4fvh2"
