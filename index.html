@@ -1,31 +1,363 @@
 <!DOCTYPE html>
-<html>
-<head><title>🏀 ShotSense AI</title>
-<style>
-body{font-family:Arial;background:linear-gradient(135deg,#667eea,#764ba2);margin:0;padding:20px}
-.container{max-width:800px;margin:0 auto;background:white;padding:40px;border-radius:20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
-.logo{font-size:4em;margin-bottom:20px}
-h1{color:#2c3e50;font-size:2.5em}
-.upload-box{background:#f8f9fa;padding:30px;border:3px dashed #3498db;border-radius:15px;margin:30px 0}
-.btn{background:#e74c3c;color:white;padding:15px 25px;border:none;border-radius:15px;font-size:16px;cursor:pointer;margin:10px;text-decoration:none;display:inline-block}
-input,select{padding:12px;margin:10px;border:2px solid #ddd;border-radius:8px;font-size:14px}
-</style></head>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏀 ShotSense AI - Basketball Shot Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .upload-area {
+            border: 3px dashed #ffa500;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #ff6b35;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* LOADING EXPERIENCE ESPN STYLE */
+        .loading-container {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .espn-title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #ffa500;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .analysis-step {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+        }
+        
+        .analysis-step.active {
+            opacity: 1;
+            background: rgba(255,165,0,0.2);
+            transform: scale(1.02);
+        }
+        
+        .step-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b35, #ffa500);
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        /* RISULTATI DRAMMATICI */
+        .results-container {
+            display: none;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .score-reveal {
+            font-size: 4em;
+            margin: 20px 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,165,0,0.3);
+        }
+        
+        .feedback-box {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+        
+        .retry-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
 <body>
-<div class="container">
-<div class="logo">🏀</div>
-<h1>ShotSense AI</h1>
-<p style="color:#7f8c8d;font-size:1.2em">Big 3 Basketball Analysis</p>
-<div class="upload-box">
-<h2>📤 Carica Video</h2>
-<form action="/upload" method="post" enctype="multipart/form-data">
-<input type="file" name="file" accept=".mp4,.mov,.avi" required><br>
-<select name="shooting_arm">
-<option value="RIGHT">Destro 👉</option>
-<option value="LEFT">Sinistro 👈</option>
-</select><br>
-<button type="submit" class="btn">🚀 Analizza Big 3</button>
-</form>
-</div>
-</div>
+    <!-- SCHERMATA UPLOAD -->
+    <div class="container" id="uploadScreen">
+        <h1>🏀 ShotSense AI</h1>
+        <p style="font-size: 1.2em; margin-bottom: 30px;">
+            Professional Basketball Shot Analysis
+        </p>
+        
+        <div class="upload-area" onclick="document.getElementById('videoFile').click()">
+            <div style="font-size: 3em; margin-bottom: 15px;">📹</div>
+            <p style="font-size: 1.3em; margin-bottom: 10px;">Drop your basketball shot video</p>
+            <p style="opacity: 0.8;">MP4, MOV, AVI supported</p>
+        </div>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="videoFile" name="file" accept="video/*" style="display: none;" onchange="startAnalysis()">
+            <input type="hidden" name="shooting_arm" value="RIGHT">
+        </form>
+        
+        <div style="margin-top: 20px; opacity: 0.7;">
+            <p>🎯 Get professional feedback on your shooting form</p>
+            <p>📊 Compare with NBA standards</p>
+        </div>
+    </div>
+
+    <!-- LOADING EXPERIENCE ESPN -->
+    <div class="container loading-container" id="loadingScreen">
+        <div class="espn-title">🏀 ShotSense AI Analysis</div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="analysis-step" id="step1">
+            <div class="step-icon">📹</div>
+            <div>Processing your shot video...</div>
+        </div>
+        
+        <div class="analysis-step" id="step2">
+            <div class="step-icon">🦵</div>
+            <div>Analyzing leg positioning and stance...</div>
+        </div>
+        
+        <div class="analysis-step" id="step3">
+            <div class="step-icon">💪</div>
+            <div>Evaluating elbow alignment...</div>
+        </div>
+        
+        <div class="analysis-step" id="step4">
+            <div class="step-icon">🎯</div>
+            <div>Measuring release point and follow-through...</div>
+        </div>
+        
+        <div class="analysis-step" id="step5">
+            <div class="step-icon">📊</div>
+            <div>Comparing with professional standards...</div>
+        </div>
+        
+        <div class="analysis-step" id="step6">
+            <div class="step-icon">⚡</div>
+            <div>Finalizing your ShotSense report...</div>
+        </div>
+    </div>
+
+    <!-- RISULTATI DRAMMATICI -->
+    <div class="container results-container" id="resultsScreen">
+        <div class="espn-title">🏀 Your ShotSense Report</div>
+        
+        <div class="score-reveal" id="finalScore">--/100</div>
+        <div style="font-size: 1.5em; margin-bottom: 30px;" id="levelText">--</div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div style="font-size: 2em;">🦵</div>
+                <div style="font-size: 1.5em; margin: 10px 0;" id="legScore">--</div>
+                <div style="font-size: 0.9em;">Legs</div>
+            </div>
+            
+            <div class="stat-card">
+                <div style="font-size: 2em;">💪</div>
+                <div style="font-size: 1.5em; margin: 10px 0;" id="elbowScore">--</div>
+                <div style="font-size: 0.9em;">Elbow</div>
+            </div>
+            
+            <div class="stat-card">
+                <div style="font-size: 2em;">🎯</div>
+                <div style="font-size: 1.5em; margin: 10px 0;" id="releaseScore">--</div>
+                <div style="font-size: 0.9em;">Release</div>
+            </div>
+        </div>
+        
+        <div class="feedback-box" id="feedbackText">
+            Loading feedback...
+        </div>
+        
+        <button class="retry-btn" onclick="resetApp()">🔄 Analyze New Shot</button>
+    </div>
+
+    <script>
+        function startAnalysis() {
+            const fileInput = document.getElementById('videoFile');
+            if (!fileInput.files[0]) return;
+            
+            // Nascondi upload, mostra loading
+            document.getElementById('uploadScreen').style.display = 'none';
+            document.getElementById('loadingScreen').style.display = 'block';
+            
+            // Avvia loading experience
+            runLoadingExperience();
+            
+            // Invio file via AJAX
+            uploadFile();
+        }
+        
+        function runLoadingExperience() {
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
+            const timings = [500, 2000, 4000, 6000, 8000, 9500]; // Timing realistici
+            
+            steps.forEach((stepId, index) => {
+                setTimeout(() => {
+                    // Attiva step corrente
+                    document.getElementById(stepId).classList.add('active');
+                    
+                    // Aggiorna progress bar
+                    const progress = ((index + 1) / steps.length) * 100;
+                    document.getElementById('progressBar').style.width = progress + '%';
+                }, timings[index]);
+            });
+        }
+        
+        function uploadFile() {
+            const formData = new FormData();
+            const fileInput = document.getElementById('videoFile');
+            
+            formData.append('file', fileInput.files[0]);
+            formData.append('shooting_arm', 'RIGHT');
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Aspetta che loading finisca (10 secondi)
+                setTimeout(() => showResults(data), 10000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Errore durante l\'analisi. Riprova.');
+                resetApp();
+            });
+        }
+        
+        function showResults(data) {
+            if (!data.success) {
+                alert('Errore: ' + data.error);
+                resetApp();
+                return;
+            }
+            
+            // Nascondi loading, mostra risultati
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'block';
+            
+            // Popola risultati
+            document.getElementById('finalScore').textContent = data.score + '/100';
+            document.getElementById('finalScore').style.color = data.color;
+            document.getElementById('levelText').textContent = data.level + ' - ' + data.level_description;
+            
+            document.getElementById('legScore').textContent = data.leg_score;
+            document.getElementById('elbowScore').textContent = data.elbow_score;
+            document.getElementById('releaseScore').textContent = data.follow_score;
+            
+            document.getElementById('feedbackText').textContent = data.feedback;
+        }
+        
+        function resetApp() {
+            // Reset tutto allo stato iniziale
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('uploadScreen').style.display = 'block';
+            
+            // Reset form
+            document.getElementById('uploadForm').reset();
+            
+            // Reset loading steps
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
+            steps.forEach(stepId => {
+                document.getElementById(stepId).classList.remove('active');
+            });
+            document.getElementById('progressBar').style.width = '0%';
+        }
+    </script>
 </body>
 </html>
